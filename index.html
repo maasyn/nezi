@@ -3,415 +3,702 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Merge 100 - Соединяй и Развивайся</title>
+<title>Merge 100 - Эволюция</title>
 
 <style>
-body      
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-            color: white;
-        }
+body {
+    font-family: 'Exo 2', sans-serif;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: white;
+}
 
-        .game-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+.game-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            animation: fadeInDown 0.8s ease;
-        }
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeInDown 0.8s ease;
+}
 
-        h1 {
-            font-size: 3em;
-            text-shadow: 0 0 20px rgba(255,255,255,0.5);
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3.5em;
+    text-shadow: 0 0 30px rgba(100, 200, 255, 0.8);
+    margin-bottom: 10px;
+    background: linear-gradient(45deg, #00f5ff, #ff00ff, #ffff00, #00f5ff);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient 4s ease infinite;
+    letter-spacing: 3px;
+}
 
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
+.subtitle {
+    font-size: 1.2em;
+    opacity: 0.8;
+    color: #a0a0ff;
+}
 
-        .stat-box {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            padding: 15px 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
 
-        .stat-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        }
+.stat-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
 
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+}
 
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            margin-top: 5px;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
-        }
+.stat-card:hover::before {
+    left: 100%;
+}
 
-        .coins { color: #ffd700; }
-        .exp { color: #4ecdc4; }
-        .level { color: #ff6b6b; }
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
 
-        .game-area {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
-            max-width: 800px;
-            margin: 0 auto 30px;
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 20px;
-            backdrop-filter: blur(5px);
-        }
+.stat-icon {
+    font-size: 2em;
+    margin-bottom: 5px;
+}
 
-        .item {
-            aspect-ratio: 1;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            position: relative;
-            overflow: hidden;
-            font-weight: bold;
-            font-size: 1.2em;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255,255,255,0.3);
-            user-select: none;
-        }
+.stat-label {
+    font-size: 0.85em;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
 
-        .item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
-            pointer-events: none;
-        }
+.stat-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+}
 
-        .item:hover {
-            transform: scale(1.1) rotate(3deg);
-            z-index: 10;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-        }
+.coins { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+.exp { color: #00f5ff; text-shadow: 0 0 20px rgba(0,245,255,0.5); }
+.level { color: #ff00ff; text-shadow: 0 0 20px rgba(255,0,255,0.5); }
+.prestige { color: #ff6b6b; text-shadow: 0 0 20px rgba(255,107,107,0.5); }
 
-        .item.selected {
-            animation: pulse 0.5s infinite alternate;
-            border-color: #fff;
-            box-shadow: 0 0 30px rgba(255,255,255,0.6);
-        }
+.progress-container {
+    margin-top: 10px;
+}
 
-        .item.merging {
-            animation: mergePop 0.6s ease;
-        }
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
 
-        .item-level {
-            font-size: 1.5em;
-            z-index: 1;
-        }
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f5ff, #ff00ff);
+    transition: width 0.5s ease;
+    box-shadow: 0 0 15px rgba(0,245,255,0.5);
+    position: relative;
+}
 
-        .item-icon {
-            font-size: 2em;
-            margin-bottom: 5px;
-            z-index: 1;
-        }
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
 
-        .controls {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+.game-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto 30px;
+    padding: 25px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+}
 
-        .btn {
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 0 10px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
+.item {
+    aspect-ratio: 1;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+    font-weight: bold;
+    font-size: 1.1em;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.2);
+    user-select: none;
+}
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-        }
+.item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+    pointer-events: none;
+}
 
-        .btn:active {
-            transform: translateY(-1px);
-        }
+.item::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 50%);
+    pointer-events: none;
+}
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+.item:hover {
+    transform: scale(1.15) rotate(5deg);
+    z-index: 10;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+}
 
-        .shop {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-            backdrop-filter: blur(10px);
-        }
+.item.selected {
+    animation: pulse 0.6s infinite alternate;
+    border-color: #fff;
+    box-shadow: 0 0 40px rgba(255,255,255,0.8), inset 0 0 20px rgba(255,255,255,0.3);
+}
 
-        .shop h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ffd700;
-        }
+.item.merging {
+    animation: mergePop 0.7s ease;
+}
 
-        .shop-items {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
+.item-locked {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
 
-        .shop-item {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            min-width: 150px;
-        }
+.item-level {
+    font-size: 1.3em;
+    z-index: 1;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
 
-        .shop-item:hover {
-            border-color: #ffd700;
-            transform: translateY(-5px);
-            background: rgba(255,255,255,0.15);
-        }
+.item-icon {
+    font-size: 2.5em;
+    margin-bottom: 5px;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
 
-        .shop-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+.item-income {
+    font-size: 0.75em;
+    opacity: 0.9;
+    z-index: 1;
+    margin-top: 2px;
+}
 
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-            position: relative;
-        }
+.controls {
+    text-align: center;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4ecdc4, #44a3aa);
-            transition: width 0.3s ease;
-            box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
-        }
+.btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1em;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    font-family: 'Exo 2', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
 
-        .floating-text {
-            position: fixed;
-            pointer-events: none;
-            font-weight: bold;
-            font-size: 1.5em;
-            animation: floatUp 1s ease-out forwards;
-            z-index: 1000;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
 
-        .victory-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 2000;
-            animation: fadeIn 0.5s;
-        }
+.btn:hover::before {
+    left: 100%;
+}
 
-        .victory-screen.active {
-            display: flex;
-        }
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+}
 
-        .victory-title {
-            font-size: 4em;
-            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient 3s ease infinite;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+.btn:active {
+    transform: translateY(-1px);
+}
 
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
-        }
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
 
-        @keyframes mergePop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); filter: brightness(1.5); }
-            100% { transform: scale(1); }
-        }
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+}
 
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
-        }
+.btn-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+}
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.btn-legendary {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    box-shadow: 0 6px 20px rgba(250, 112, 154, 0.4);
+    animation: glow 2s ease-in-out infinite alternate;
+}
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+.shop {
+    background: rgba(255,255,255,0.03);
+    border-radius: 25px;
+    padding: 25px;
+    margin-top: 20px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+.shop h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #ffd700;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8em;
+    text-shadow: 0 0 20px rgba(255,215,0,0.5);
+}
 
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 999;
-        }
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
-        .particle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #ffd700;
-            border-radius: 50%;
-            animation: particleFloat 1s ease-out forwards;
-        }
+.shop-item {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
 
-        @keyframes particleFloat {
-            0% { opacity: 1; transform: translate(0, 0) scale(1); }
-            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
-        }
+.shop-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
 
-        .info-panel {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            font-size: 0.95em;
-            line-height: 1.6;
-        }
+.shop-item:hover::before {
+    opacity: 1;
+}
 
-        .max-level {
-            animation: rainbow 2s linear infinite;
-        }
+.shop-item:hover {
+    border-color: #00f5ff;
+    transform: translateY(-8px);
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 15px 40px rgba(0,245,255,0.2);
+}
 
-        @keyframes rainbow {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-    </style>
+.shop-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.shop-item-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.shop-item-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.shop-item-desc {
+    font-size: 0.85em;
+    opacity: 0.7;
+    margin-bottom: 10px;
+}
+
+.shop-item-cost {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 1.2em;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.floating-text {
+    position: fixed;
+    pointer-events: none;
+    font-weight: bold;
+    font-size: 1.4em;
+    animation: floatUp 1.2s ease-out forwards;
+    z-index: 1000;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.victory-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2000;
+    animation: fadeIn 0.5s;
+}
+
+.victory-screen.active {
+    display: flex;
+}
+
+.victory-title {
+    font-size: 4em;
+    background: linear-gradient(45deg, #ffd700, #ff00ff, #00f5ff, #ffd700);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient 3s ease infinite;
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.prestige-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2000;
+    animation: fadeIn 0.5s;
+}
+
+.prestige-screen.active {
+    display: flex;
+}
+
+.achievement-popup {
+    position: fixed;
+    top: 20px;
+    right: -400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    transition: right 0.5s ease;
+    z-index: 1500;
+    max-width: 350px;
+}
+
+.achievement-popup.show {
+    right: 20px;
+}
+
+.achievement-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: #ffd700;
+}
+
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 999;
+}
+
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: particleFloat 1.2s ease-out forwards;
+}
+
+.info-panel {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    font-size: 1em;
+    line-height: 1.6;
+    border: 1px solid rgba(255,255,255,0.1);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.max-level {
+    animation: rainbow 3s linear infinite;
+}
+
+.combo-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4em;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 999;
+    text-shadow: 0 0 40px rgba(255,215,0,0.8);
+}
+
+.combo-indicator.show {
+    animation: comboPop 1s ease-out forwards;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+}
+
+@keyframes mergePop {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.4); filter: brightness(1.8); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
+@keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    50% { opacity: 1; transform: translateY(-50px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-120px) scale(1.5); }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes rainbow {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes glow {
+    from { box-shadow: 0 6px 20px rgba(250, 112, 154, 0.4); }
+    to { box-shadow: 0 6px 30px rgba(250, 112, 154, 0.8), 0 0 40px rgba(254, 225, 64, 0.4); }
+}
+
+@keyframes comboPop {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
+}
+
+@media (max-width: 768px) {
+    h1 { font-size: 2em; }
+    .game-area { grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 15px; }
+    .item-icon { font-size: 1.8em; }
+    .shop-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
     <div class="game-container">
         <div class="header">
             <h1>🔥 MERGE 100 🔥</h1>
-            <p>Соединяй одинаковые предметы, достигни 100 уровня!</p>
+            <p class="subtitle">Создайте легендарный артефакт 100 уровня!</p>
         </div>
 
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-label">💰 Монеты</div>
-                <div class="stat-value coins" id="coins">1</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="coin-progress" style="width: 0%"></div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Монеты</div>
+                <div class="stat-value coins" id="coins">50</div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="coin-progress" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">⭐ Опыт</div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-label">Опыт</div>
                 <div class="stat-value exp" id="exp">0</div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="exp-progress" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">🏆 Макс. Уровень</div>
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-label">Макс. Уровень</div>
                 <div class="stat-value level" id="max-level">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💎</div>
+                <div class="stat-label">Очки Престижа</div>
+                <div class="stat-value prestige" id="prestige-points">0</div>
             </div>
         </div>
 
         <div class="info-panel">
-            💡 <strong>Совет:</strong> Выбери два одинаковых предмета, чтобы соединить их. 
-            Каждое соединение даёт опыт и увеличивает доход! 
-            <br>Автодоход: <span id="income-display">1</span> монет/сек
+            💡 <strong>Как играть:</strong> Выбирайте два одинаковых предмета для слияния. 
+            Чем выше уровень, тем больше доход! Текущий доход: <span id="income-display" style="color: #ffd700; font-weight: bold;">1</span> монет/сек
+            <br><span id="combo-text" style="color: #ff00ff; font-weight: bold;"></span>
         </div>
 
         <div class="controls">
-            <button class="btn" onclick="game.spawnItem()">🎲 Создать предмет (10 монет)</button>
-            <button class="btn" onclick="game.buyAutoMerge()">🤖 Авто-слияние (<span id="auto-merge-cost">1000</span>)</button>
+            <button class="btn" onclick="game.spawnItem()" id="spawn-btn">
+                🎲 Создать предмет (10💰)
+            </button>
+            <button class="btn btn-success" onclick="game.mergeAll()" id="merge-all-btn">
+                ⚡ Слить всё возможное
+            </button>
+            <button class="btn btn-warning" onclick="game.buyAutoMerge()" id="auto-merge-btn">
+                🤖 Авто-слияние (1000💰)
+            </button>
+            <button class="btn btn-legendary" onclick="game.prestige()" id="prestige-btn" style="display: none;">
+                💎 ПРЕСТИЖ (Сброс с бонусом)
+            </button>
         </div>
 
         <div class="game-area" id="game-area"></div>
 
         <div class="shop">
-            <h2>🛒 Магазин улучшений</h2>
-            <div class="shop-items">
-                <div class="shop-item" onclick="game.buySlot()">
-                    <div>📦 Новый слот</div>
-                    <div style="color: #ffd700; margin-top: 5px;">💰 <span id="slot-cost">100</span></div>
+            <h2>🛒 Магазин Улучшений</h2>
+            <div class="shop-grid">
+                <div class="shop-item" onclick="game.buySlot()" id="shop-slot">
+                    <div class="shop-item-icon">📦</div>
+                    <div class="shop-item-name">Новый Слот</div>
+                    <div class="shop-item-desc">+1 место для предметов</div>
+                    <div class="shop-item-cost">💰 <span id="slot-cost">100</span></div>
                 </div>
-                <div class="shop-item" onclick="game.boostIncome()">
-                    <div>⚡ Ускорить доход x2</div>
-                    <div style="color: #ffd700; margin-top: 5px;">💰 <span id="boost-cost">500</span></div>
+                <div class="shop-item" onclick="game.boostIncome()" id="shop-boost">
+                    <div class="shop-item-icon">⚡</div>
+                    <div class="shop-item-name">Усилитель Дохода</div>
+                    <div class="shop-item-desc">Увеличивает доход в 2 раза</div>
+                    <div class="shop-item-cost">💰 <span id="boost-cost">500</span></div>
                 </div>
-                <div class="shop-item" onclick="game.buyHighLevel()">
-                    <div>🚀 Купить уровень <span id="shop-level">5</span></div>
-                    <div style="color: #ffd700; margin-top: 5px;">💰 <span id="high-level-cost">10000</span></div>
+                <div class="shop-item" onclick="game.buyCriticalChance()" id="shop-crit">
+                    <div class="shop-item-icon">🎯</div>
+                    <div class="shop-item-name">Критический Шанс</div>
+                    <div class="shop-item-desc">Шанс получить +1 уровень при создании</div>
+                    <div class="shop-item-cost">💰 <span id="crit-cost">2000</span></div>
+                </div>
+                <div class="shop-item" onclick="game.buyTimeWarp()" id="shop-warp">
+                    <div class="shop-item-icon">⏰</div>
+                    <div class="shop-item-name">Временной Скачок</div>
+                    <div class="shop-item-desc">Получить 5 минут дохода мгновенно</div>
+                    <div class="shop-item-cost">💰 <span id="warp-cost">5000</span></div>
                 </div>
             </div>
         </div>
@@ -419,47 +706,90 @@ body
 
     <div class="victory-screen" id="victory">
         <div class="victory-title">🎉 ПОБЕДА! 🎉</div>
-        <p style="font-size: 1.5em; margin-bottom: 30px;">Вы достигли 100 уровня!</p>
-        <p style="font-size: 1.2em; margin-bottom: 20px;">Финальный счёт: <span id="final-score"></span></p>
-        <button class="btn" onclick="location.reload()">🔄 Играть снова</button>
+        <p style="font-size: 1.5em; margin-bottom: 20px;">Вы создали артефакт 100 уровня!</p>
+        <p style="font-size: 1.2em; margin-bottom: 10px;">Финальный счёт: <span id="final-score" style="color: #ffd700;"></span></p>
+        <p style="font-size: 1.1em; margin-bottom: 30px; opacity: 0.8;">Очки престижа: +<span id="victory-prestige" style="color: #ff6b6b;"></span></p>
+        <button class="btn btn-legendary" onclick="game.continueAfterVictory()">🚀 Продолжить игру</button>
+        <button class="btn" onclick="location.reload()" style="margin-top: 15px;">🔄 Начать заново</button>
     </div>
+
+    <div class="prestige-screen" id="prestige-screen">
+        <div class="victory-title">💎 ПРЕСТИЖ 💎</div>
+        <p style="font-size: 1.3em; margin-bottom: 20px; max-width: 600px; text-align: center;">
+            Сбросьте прогресс чтобы получить <span style="color: #ff6b6b; font-weight: bold;">Очки Престижа</span>!<br>
+            Каждое очко даёт <span style="color: #ffd700;">+10%</span> к доходу навсегда.
+        </p>
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 30px;">
+            <p>Текущий множитель: <span id="current-multiplier" style="color: #00f5ff; font-size: 1.3em;">1.0x</span></p>
+            <p>После престижа: <span id="new-multiplier" style="color: #ffd700; font-size: 1.3em;">1.0x</span></p>
+            <p>Очки престижа: +<span id="prestige-gain" style="color: #ff6b6b; font-size: 1.3em;">0</span></p>
+        </div>
+        <button class="btn btn-legendary" onclick="game.confirmPrestige()">💎 Подтвердить Престиж</button>
+        <button class="btn" onclick="game.closePrestige()" style="margin-top: 15px;">❌ Отмена</button>
+    </div>
+
+    <div class="achievement-popup" id="achievement">
+        <div class="achievement-title">🏆 Достижение разблокировано!</div>
+        <div id="achievement-text">Текст достижения</div>
+    </div>
+
+    <div class="combo-indicator" id="combo">COMBO x2!</div>
 
     <canvas class="particles" id="particles"></canvas>
 
     <script>
         class Game {
             constructor() {
-                this.coins = 10;
+                this.coins = 50;
                 this.exp = 0;
                 this.maxLevel = 1;
                 this.items = [];
                 this.selectedIndex = null;
-                this.slots = 12;
+                this.slots = 10;
                 this.incomeMultiplier = 1;
+                this.prestigeMultiplier = 1;
+                this.prestigePoints = 0;
                 this.baseIncome = 1;
                 this.lastIncome = 0;
                 this.autoMergeUnlocked = false;
                 this.autoMergeInterval = null;
+                this.criticalChance = 0;
+                this.comboCount = 0;
+                this.lastMergeTime = 0;
+                this.achievements = new Set();
+                this.victoryAchieved = false;
                 
-                // Цены
                 this.costs = {
                     slot: 100,
                     boost: 500,
                     autoMerge: 1000,
-                    highLevel: 10000
+                    crit: 2000,
+                    warp: 5000
                 };
                 
-                this.shopLevel = 5;
+                this.levelEmojis = {
+                    1: '🌱', 2: '🌿', 3: '🍀', 4: '🌲', 5: '🌳',
+                    6: '🌴', 7: '🎋', 8: '🎄', 9: '🌵', 10: '⚡',
+                    11: '🔥', 12: '💧', 13: '❄️', 14: '🌪️', 15: '🌈',
+                    16: '☀️', 17: '🌙', 18: '⭐', 19: '🌟', 20: '💫',
+                    21: '🪐', 22: '🌍', 23: '🌠', 24: '🎯', 25: '🎪',
+                    26: '🎨', 27: '🎭', 28: '🎰', 29: '🎲', 30: '🔮',
+                    31: '💎', 32: '💍', 33: '👑', 34: '🏆', 35: '🎖️',
+                    36: '🏅', 37: '🥇', 38: '🥈', 39: '🥉', 40: '⚜️',
+                    41: '🔱', 42: '⚖️', 43: '🗝️', 44: '🛡️', 45: '⚔️',
+                    46: '🏹', 47: '🔫', 48: '💣', 49: '🧪', 50: '⚗️',
+                    51: '🔭', 52: '🔬', 53: '📡', 54: '🚀', 55: '🛸',
+                    56: '🌌', 57: '👽', 58: '🤖', 59: '👾', 60: '🎮',
+                    61: '🕹️', 62: '💻', 63: '📱', 64: '💾', 65: '💿',
+                    66: '📀', 67: '🎵', 68: '🎶', 69: '🎼', 70: '🎹',
+                    71: '🎸', 72: '🎺', 73: '🎻', 74: '📯', 75: '🔔',
+                    76: '🕯️', 77: '💡', 78: '🔦', 79: '🏮', 80: '🎆',
+                    81: '🎇', 82: '✨', 83: '🎈', 84: '🎉', 85: '🎊',
+                    86: '🎋', 87: '🎍', 88: '🎎', 89: '🎏', 90: '🎐',
+                    91: '🎑', 92: '🧧', 93: '🎀', 94: '🎁', 95: '🎗️',
+                    96: '🏷️', 97: '📛', 98: '🔖', 99: '📌', 100: '👑'
+                };
                 
-                this.emojis = ['🌱', '🌿', '🌲', '💎', '🔮', '⚡', '🔥', '⭐', '🌟', '💫', '🌙', '☀️', '🪐', '👑', '🏆', '🎯', '🎪', '🎨', '🎭', '🎪'];
-                this.colors = [
-                    '#2ecc71', '#27ae60', '#229954', '#1e8449', '#1abc9c',
-                    '#16a085', '#3498db', '#2980b9', '#9b59b6', '#8e44ad',
-                    '#e74c3c', '#c0392b', '#f39c12', '#d68910', '#f1c40f',
-                    '#d4ac0d', '#e67e22', '#d35400', '#95a5a6', '#7f8c8d',
-                    '#34495e', '#2c3e50', '#1abc9c', '#16a085', '#2ecc71'
-                ];
-
                 this.init();
             }
 
@@ -467,39 +797,37 @@ body
                 this.render();
                 this.startIncome();
                 this.spawnInitialItems();
+                this.checkPrestigeAvailability();
             }
 
             spawnInitialItems() {
                 for (let i = 0; i < 4; i++) {
-                    this.items.push({ level: 1 });
+                    this.items.push({ level: 1, id: Date.now() + i });
                 }
                 this.render();
             }
 
             getItemColor(level) {
-                if (level >= 100) return `linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4)`;
-                if (level >= 90) return `linear-gradient(45deg, #ff006e, #8338ec, #3a86ff)`;
-                if (level >= 80) return `linear-gradient(45deg, #f72585, #7209b7, #3a0ca3)`;
-                if (level >= 70) return `linear-gradient(45deg, #ff006e, #ffbe0b, #fb5607)`;
-                if (level >= 60) return `linear-gradient(45deg, #00f5ff, #00bbf9, #00f5d4)`;
-                if (level >= 50) return `linear-gradient(45deg, #9b5de5, #f15bb5, #00bbf9)`;
-                if (level >= 40) return `linear-gradient(45deg, #00bbf9, #00f5d4, #fee440)`;
-                if (level >= 30) return `linear-gradient(45deg, #f15bb5, #fee440, #00f5d4)`;
-                if (level >= 20) return `linear-gradient(45deg, #9b5de5, #00bbf9, #00f5d4)`;
-                return this.colors[(level - 1) % this.colors.length] || '#2ecc71';
+                if (level >= 100) return `linear-gradient(45deg, #ffd700, #ff00ff, #00f5ff, #ffd700)`;
+                if (level >= 90) return `linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #ff006e)`;
+                if (level >= 80) return `linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #f72585)`;
+                if (level >= 70) return `linear-gradient(45deg, #ff006e, #ffbe0b, #fb5607, #ff006e)`;
+                if (level >= 60) return `linear-gradient(45deg, #00f5ff, #00bbf9, #00f5d4, #00f5ff)`;
+                if (level >= 50) return `linear-gradient(45deg, #9b5de5, #f15bb5, #00bbf9, #9b5de5)`;
+                if (level >= 40) return `linear-gradient(45deg, #00bbf9, #00f5d4, #fee440, #00bbf9)`;
+                if (level >= 30) return `linear-gradient(45deg, #f15bb5, #fee440, #00f5d4, #f15bb5)`;
+                if (level >= 20) return `linear-gradient(45deg, #9b5de5, #00bbf9, #00f5d4, #9b5de5)`;
+                if (level >= 10) return `linear-gradient(45deg, #2ecc71, #3498db, #9b59b6, #2ecc71)`;
+                
+                const colors = [
+                    '#2ecc71', '#27ae60', '#229954', '#1e8449', '#1abc9c',
+                    '#16a085', '#3498db', '#2980b9', '#9b59b6', '#8e44ad'
+                ];
+                return colors[(level - 1) % colors.length];
             }
 
             getItemEmoji(level) {
-                if (level >= 100) return '👑';
-                if (level >= 90) return '💎';
-                if (level >= 80) return '🔮';
-                if (level >= 70) return '⚡';
-                if (level >= 60) return '🔥';
-                if (level >= 50) return '🌟';
-                if (level >= 40) return '⭐';
-                if (level >= 30) return '🌙';
-                if (level >= 20) return '🪐';
-                return this.emojis[(level - 1) % this.emojis.length] || '✨';
+                return this.levelEmojis[level] || '✨';
             }
 
             formatNumber(num) {
@@ -516,9 +844,9 @@ body
             getIncome() {
                 let income = 0;
                 this.items.forEach(item => {
-                    income += Math.pow(2, item.level - 1);
+                    income += Math.pow(1.8, item.level - 1) * (1 + item.level * 0.1);
                 });
-                return income * this.incomeMultiplier;
+                return income * this.incomeMultiplier * this.prestigeMultiplier;
             }
 
             startIncome() {
@@ -542,14 +870,21 @@ body
                 
                 this.coins -= 10;
                 
-                // Шанс получить предмет выше 1 уровня
                 let level = 1;
                 const rand = Math.random();
-                if (rand > 0.95 && this.maxLevel >= 10) level = Math.min(10, Math.floor(this.maxLevel / 2));
-                else if (rand > 0.8 && this.maxLevel >= 5) level = Math.min(5, Math.floor(this.maxLevel / 3));
-                else if (rand > 0.6 && this.maxLevel >= 3) level = 2;
                 
-                this.items.push({ level });
+                if (rand < this.criticalChance) {
+                    level = Math.min(5, Math.floor(this.maxLevel / 3) + 1);
+                    this.showFloatingText('КРИТ! +' + level + ' уровень!', window.innerWidth/2, window.innerHeight/2 - 50, '#ff00ff');
+                } else if (rand > 0.95 && this.maxLevel >= 10) {
+                    level = Math.min(5, Math.floor(this.maxLevel / 4));
+                } else if (rand > 0.85 && this.maxLevel >= 5) {
+                    level = Math.min(3, Math.floor(this.maxLevel / 5));
+                } else if (rand > 0.7 && this.maxLevel >= 3) {
+                    level = 2;
+                }
+                
+                this.items.push({ level, id: Date.now() });
                 this.render();
                 this.createParticles(window.innerWidth/2, window.innerHeight/2);
             }
@@ -572,42 +907,100 @@ body
                 const item2 = this.items[idx2];
 
                 if (item1.level === item2.level) {
-                    // Успешное слияние
                     const newLevel = item1.level + 1;
-                    const rect = document.querySelector(`[data-index="${idx2}"]`).getBoundingClientRect();
+                    const rect = document.querySelector(`[data-index="${idx2}"]`)?.getBoundingClientRect();
+                    const x = rect ? rect.left + 50 : window.innerWidth/2;
+                    const y = rect ? rect.top : window.innerHeight/2;
                     
-                    // Награды
-                    const expGain = newLevel * 10;
-                    const coinBonus = Math.pow(2, newLevel);
+                    const now = Date.now();
+                    if (now - this.lastMergeTime < 2000) {
+                        this.comboCount++;
+                    } else {
+                        this.comboCount = 1;
+                    }
+                    this.lastMergeTime = now;
+                    
+                    const comboBonus = Math.min(this.comboCount, 5);
+                    if (comboBonus > 1) {
+                        this.showCombo(comboBonus);
+                    }
+                    
+                    const expGain = newLevel * 10 * comboBonus;
+                    const coinBonus = Math.pow(2, newLevel) * comboBonus;
                     
                     this.exp += expGain;
                     this.coins += coinBonus;
                     
                     if (newLevel > this.maxLevel) {
                         this.maxLevel = newLevel;
-                        this.showFloatingText(`Новый рекорд: ${newLevel} уровень!`, rect.left + 50, rect.top, '#ffd700');
+                        this.checkAchievements('level', newLevel);
+                        this.showFloatingText(`Новый рекорд: ${newLevel}!`, x, y - 20, '#ffd700');
                     }
                     
-                    this.showFloatingText(`+${this.formatNumber(coinBonus)}💰`, rect.left + 50, rect.top + 30, '#ffd700');
-                    this.showFloatingText(`+${expGain}⭐`, rect.left + 50, rect.top + 60, '#4ecdc4');
+                    this.showFloatingText(`+${this.formatNumber(coinBonus)}💰`, x, y + 10, '#ffd700');
+                    this.showFloatingText(`+${expGain}⭐`, x, y + 40, '#00f5ff');
                     
-                    // Удаляем старые, добавляем новый
+                    if (comboBonus > 1) {
+                        this.showFloatingText(`COMBO x${comboBonus}!`, x, y + 70, '#ff00ff');
+                    }
+                    
                     const newItems = this.items.filter((_, i) => i !== idx1 && i !== idx2);
-                    newItems.push({ level: newLevel });
+                    newItems.push({ level: newLevel, id: Date.now() });
                     this.items = newItems;
                     
-                    this.createParticles(rect.left + 50, rect.top + 50);
+                    this.createParticles(x, y + 50);
                     
-                    // Проверка победы
-                    if (newLevel >= 100) {
+                    if (newLevel >= 100 && !this.victoryAchieved) {
                         this.victory();
                     }
                     
+                    this.checkPrestigeAvailability();
                     this.render();
                 } else {
                     this.showFloatingText('Разные уровни!', window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
+                    this.comboCount = 0;
                     this.selectedIndex = null;
                     this.render();
+                }
+            }
+
+            mergeAll() {
+                let merged = false;
+                let iterations = 0;
+                const maxIterations = 50;
+                
+                do {
+                    merged = false;
+                    const levels = {};
+                    
+                    this.items.forEach((item, idx) => {
+                        if (!levels[item.level]) levels[item.level] = [];
+                        levels[item.level].push(idx);
+                    });
+                    
+                    for (let level in levels) {
+                        while (levels[level].length >= 2) {
+                            const idx1 = levels[level].shift();
+                            const idx2 = levels[level].shift();
+                            this.tryMerge(idx1, idx2);
+                            merged = true;
+                            
+                            Object.keys(levels).forEach(l => {
+                                levels[l] = levels[l].map(i => {
+                                    if (i > idx1 && i > idx2) return i - 2;
+                                    if (i > idx1 || i > idx2) return i - 1;
+                                    return i;
+                                });
+                            });
+                            break;
+                        }
+                        if (merged) break;
+                    }
+                    iterations++;
+                } while (merged && iterations < maxIterations);
+                
+                if (iterations === 1 && !merged) {
+                    this.showFloatingText('Нет пар для слияния!', window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
                 }
             }
 
@@ -615,9 +1008,9 @@ body
                 if (this.coins >= this.costs.slot) {
                     this.coins -= this.costs.slot;
                     this.slots++;
-                    this.costs.slot = Math.floor(this.costs.slot * 1.5);
+                    this.costs.slot = Math.floor(this.costs.slot * 1.6);
                     this.render();
-                    this.showFloatingText('+1 слот!', window.innerWidth/2, window.innerHeight/2, '#4ecdc4');
+                    this.showFloatingText('+1 слот!', window.innerWidth/2, window.innerHeight/2, '#00f5ff');
                 }
             }
 
@@ -625,7 +1018,7 @@ body
                 if (this.coins >= this.costs.boost) {
                     this.coins -= this.costs.boost;
                     this.incomeMultiplier *= 2;
-                    this.costs.boost = Math.floor(this.costs.boost * 3);
+                    this.costs.boost = Math.floor(this.costs.boost * 2.5);
                     this.render();
                     this.showFloatingText('Доход x2!', window.innerWidth/2, window.innerHeight/2, '#ffd700');
                 }
@@ -638,13 +1031,34 @@ body
                     this.autoMergeUnlocked = true;
                     this.startAutoMerge();
                     this.render();
-                    this.showFloatingText('Авто-слияние активировано!', window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
+                    this.showFloatingText('Авто-слияние активировано!', window.innerWidth/2, window.innerHeight/2, '#ff00ff');
+                }
+            }
+
+            buyCriticalChance() {
+                if (this.coins >= this.costs.crit && this.criticalChance < 0.5) {
+                    this.coins -= this.costs.crit;
+                    this.criticalChance = Math.min(0.5, this.criticalChance + 0.05);
+                    this.costs.crit = Math.floor(this.costs.crit * 1.8);
+                    this.render();
+                    this.showFloatingText(`Шанс крита: ${(this.criticalChance * 100).toFixed(0)}%`, window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
+                }
+            }
+
+            buyTimeWarp() {
+                if (this.coins >= this.costs.warp) {
+                    this.coins -= this.costs.warp;
+                    const warpIncome = this.getIncome() * 300;
+                    this.coins += warpIncome;
+                    this.costs.warp = Math.floor(this.costs.warp * 1.5);
+                    this.render();
+                    this.showFloatingText(`+${this.formatNumber(warpIncome)}💰`, window.innerWidth/2, window.innerHeight/2, '#ffd700');
+                    this.createParticles(window.innerWidth/2, window.innerHeight/2);
                 }
             }
 
             startAutoMerge() {
                 this.autoMergeInterval = setInterval(() => {
-                    // Ищем пары для автослияния
                     const levels = {};
                     this.items.forEach((item, idx) => {
                         if (!levels[item.level]) levels[item.level] = [];
@@ -657,24 +1071,108 @@ body
                             break;
                         }
                     }
-                }, 2000);
+                }, 3000);
             }
 
-            buyHighLevel() {
-                if (this.coins >= this.costs.highLevel) {
-                    this.coins -= this.costs.highLevel;
-                    this.items.push({ level: this.shopLevel });
-                    this.shopLevel += 5;
-                    this.costs.highLevel = Math.floor(this.costs.highLevel * 5);
-                    this.render();
-                    this.showFloatingText(`Куплен ${this.shopLevel - 5} уровень!`, window.innerWidth/2, window.innerHeight/2, '#9b5de5');
+            checkPrestigeAvailability() {
+                const btn = document.getElementById('prestige-btn');
+                if (this.maxLevel >= 25) {
+                    btn.style.display = 'inline-block';
                 }
             }
 
+            prestige() {
+                const gain = Math.floor(Math.pow(this.maxLevel, 1.5) / 10);
+                document.getElementById('current-multiplier').textContent = this.prestigeMultiplier.toFixed(1) + 'x';
+                document.getElementById('new-multiplier').textContent = (this.prestigeMultiplier + gain * 0.1).toFixed(1) + 'x';
+                document.getElementById('prestige-gain').textContent = gain;
+                document.getElementById('prestige-screen').classList.add('active');
+            }
+
+            confirmPrestige() {
+                const gain = Math.floor(Math.pow(this.maxLevel, 1.5) / 10);
+                this.prestigePoints += gain;
+                this.prestigeMultiplier += gain * 0.1;
+                
+                this.coins = 50;
+                this.exp = 0;
+                this.maxLevel = 1;
+                this.items = [];
+                this.selectedIndex = null;
+                this.slots = 10;
+                this.incomeMultiplier = 1;
+                this.criticalChance = 0;
+                this.comboCount = 0;
+                
+                this.costs = {
+                    slot: 100,
+                    boost: 500,
+                    autoMerge: 1000,
+                    crit: 2000,
+                    warp: 5000
+                };
+                
+                if (this.autoMergeInterval) {
+                    clearInterval(this.autoMergeInterval);
+                    this.autoMergeInterval = null;
+                }
+                this.autoMergeUnlocked = false;
+                
+                this.closePrestige();
+                this.spawnInitialItems();
+                this.render();
+                this.showFloatingText(`Престиж выполнен! +${gain} очков`, window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
+            }
+
+            closePrestige() {
+                document.getElementById('prestige-screen').classList.remove('active');
+            }
+
+            checkAchievements(type, value) {
+                const achievements = [
+                    { id: 'level10', check: () => this.maxLevel >= 10, text: 'Достигнут 10 уровень!' },
+                    { id: 'level25', check: () => this.maxLevel >= 25, text: 'Достигнут 25 уровень!' },
+                    { id: 'level50', check: () => this.maxLevel >= 50, text: 'Достигнут 50 уровень!' },
+                    { id: 'level75', check: () => this.maxLevel >= 75, text: 'Достигнут 75 уровень!' },
+                    { id: 'rich', check: () => this.coins >= 1000000, text: 'Миллионер!' },
+                    { id: 'slots', check: () => this.slots >= 20, text: 'Коллекционер!' }
+                ];
+                
+                achievements.forEach(ach => {
+                    if (!this.achievements.has(ach.id) && ach.check()) {
+                        this.achievements.add(ach.id);
+                        this.showAchievement(ach.text);
+                    }
+                });
+            }
+
+            showAchievement(text) {
+                const popup = document.getElementById('achievement');
+                document.getElementById('achievement-text').textContent = text;
+                popup.classList.add('show');
+                setTimeout(() => popup.classList.remove('show'), 3000);
+            }
+
+            showCombo(multiplier) {
+                const combo = document.getElementById('combo');
+                combo.textContent = `COMBO x${multiplier}!`;
+                combo.classList.add('show');
+                setTimeout(() => combo.classList.remove('show'), 1000);
+            }
+
             victory() {
+                this.victoryAchieved = true;
+                const prestigeGain = Math.floor(Math.pow(100, 1.5) / 5);
                 document.getElementById('final-score').textContent = this.formatNumber(this.coins);
+                document.getElementById('victory-prestige').textContent = prestigeGain;
                 document.getElementById('victory').classList.add('active');
                 this.createFireworks();
+            }
+
+            continueAfterVictory() {
+                document.getElementById('victory').classList.remove('active');
+                this.prestigePoints += Math.floor(Math.pow(100, 1.5) / 5);
+                this.prestigeMultiplier += Math.floor(Math.pow(100, 1.5) / 5) * 0.1;
             }
 
             showFloatingText(text, x, y, color) {
@@ -685,52 +1183,72 @@ body
                 el.style.top = y + 'px';
                 el.style.color = color;
                 document.body.appendChild(el);
-                setTimeout(() => el.remove(), 1000);
+                setTimeout(() => el.remove(), 1200);
             }
 
             createParticles(x, y) {
-                const canvas = document.getElementById('particles');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                
-                for (let i = 0; i < 20; i++) {
+                for (let i = 0; i < 25; i++) {
                     const particle = document.createElement('div');
                     particle.className = 'particle';
                     particle.style.left = x + 'px';
                     particle.style.top = y + 'px';
-                    particle.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
-                    particle.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
-                    particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    const angle = (Math.PI * 2 * i) / 25;
+                    const velocity = 50 + Math.random() * 100;
+                    particle.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+                    particle.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+                    particle.style.background = `hsl(${Math.random() * 360}, 100%, 60%)`;
+                    particle.style.boxShadow = `0 0 10px ${particle.style.background}`;
                     document.body.appendChild(particle);
-                    setTimeout(() => particle.remove(), 1000);
+                    setTimeout(() => particle.remove(), 1200);
                 }
             }
 
             createFireworks() {
-                setInterval(() => {
+                const interval = setInterval(() => {
+                    if (!document.getElementById('victory').classList.contains('active')) {
+                        clearInterval(interval);
+                        return;
+                    }
                     const x = Math.random() * window.innerWidth;
                     const y = Math.random() * window.innerHeight;
                     this.createParticles(x, y);
-                }, 500);
+                }, 300);
             }
 
             updateUI() {
                 document.getElementById('coins').textContent = this.formatNumber(this.coins);
                 document.getElementById('exp').textContent = this.formatNumber(this.exp);
                 document.getElementById('max-level').textContent = this.maxLevel;
+                document.getElementById('prestige-points').textContent = this.prestigePoints;
                 document.getElementById('income-display').textContent = this.formatNumber(this.getIncome());
                 
-                // Обновление прогресса монет (визуальный)
-                const progress = Math.min(100, (this.coins / (this.coins + 1000)) * 100);
-                document.getElementById('coin-progress').style.width = progress + '%';
+                const coinProgress = Math.min(100, (this.coins / (this.coins + 10000)) * 100);
+                document.getElementById('coin-progress').style.width = coinProgress + '%';
                 
-                // Обновление цен
+                const expProgress = Math.min(100, (this.exp / (this.exp + 1000)) * 100);
+                document.getElementById('exp-progress').style.width = expProgress + '%';
+                
                 document.getElementById('slot-cost').textContent = this.formatNumber(this.costs.slot);
                 document.getElementById('boost-cost').textContent = this.formatNumber(this.costs.boost);
-                document.getElementById('auto-merge-cost').textContent = this.autoMergeUnlocked ? 'Куплено' : this.formatNumber(this.costs.autoMerge);
-                document.getElementById('high-level-cost').textContent = this.formatNumber(this.costs.highLevel);
-                document.getElementById('shop-level').textContent = this.shopLevel;
+                document.getElementById('auto-merge-btn').innerHTML = 
+                    this.autoMergeUnlocked ? '✅ Авто-слияние активно' : `🤖 Авто-слияние (${this.formatNumber(this.costs.autoMerge)}💰)`;
+                document.getElementById('crit-cost').textContent = this.formatNumber(this.costs.crit);
+                document.getElementById('warp-cost').textContent = this.formatNumber(this.costs.warp);
+                
+                const spawnBtn = document.getElementById('spawn-btn');
+                spawnBtn.disabled = this.items.length >= this.slots || this.coins < 10;
+                
+                const autoMergeBtn = document.getElementById('auto-merge-btn');
+                autoMergeBtn.disabled = this.autoMergeUnlocked || this.coins < this.costs.autoMerge;
+                
+                document.getElementById('shop-slot').className = 
+                    'shop-item' + (this.coins < this.costs.slot ? ' disabled' : '');
+                document.getElementById('shop-boost').className = 
+                    'shop-item' + (this.coins < this.costs.boost ? ' disabled' : '');
+                document.getElementById('shop-crit').className = 
+                    'shop-item' + (this.coins < this.costs.crit || this.criticalChance >= 0.5 ? ' disabled' : '');
+                document.getElementById('shop-warp').className = 
+                    'shop-item' + (this.coins < this.costs.warp ? ' disabled' : '');
             }
 
             render() {
@@ -739,7 +1257,6 @@ body
                 const container = document.getElementById('game-area');
                 container.innerHTML = '';
                 
-                // Отображаем существующие предметы
                 this.items.forEach((item, index) => {
                     const div = document.createElement('div');
                     div.className = 'item';
@@ -749,36 +1266,32 @@ body
                     div.style.background = this.getItemColor(item.level);
                     div.dataset.index = index;
                     
+                    const income = Math.pow(1.8, item.level - 1) * (1 + item.level * 0.1) * this.incomeMultiplier * this.prestigeMultiplier;
+                    
                     div.innerHTML = `
                         <div class="item-icon">${this.getItemEmoji(item.level)}</div>
                         <div class="item-level">${item.level}</div>
+                        <div class="item-income">${this.formatNumber(income)}/с</div>
                     `;
                     
                     div.onclick = () => this.selectItem(index);
                     container.appendChild(div);
                 });
                 
-                // Пустые слоты
                 for (let i = this.items.length; i < this.slots; i++) {
                     const div = document.createElement('div');
                     div.className = 'item';
-                    div.style.background = 'rgba(255,255,255,0.05)';
-                    div.style.border = '2px dashed rgba(255,255,255,0.2)';
+                    div.style.background = 'rgba(255,255,255,0.03)';
+                    div.style.border = '2px dashed rgba(255,255,255,0.15)';
                     div.style.cursor = 'default';
-                    div.innerHTML = '<div style="opacity: 0.3; font-size: 2em;">+</div>';
+                    div.innerHTML = '<div style="opacity: 0.2; font-size: 2em;">+</div>';
                     container.appendChild(div);
                 }
-                
-                // Обновление состояния кнопок
-                const buttons = document.querySelectorAll('.btn');
-                buttons[0].disabled = this.items.length >= this.slots || this.coins < 10;
-                buttons[1].disabled = this.autoMergeUnlocked || this.coins < this.costs.autoMerge;
             }
         }
 
         const game = new Game();
 
-        // Адаптация размера canvas
         window.addEventListener('resize', () => {
             const canvas = document.getElementById('particles');
             canvas.width = window.innerWidth;
