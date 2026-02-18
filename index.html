@@ -149,7 +149,7 @@ body {
 
         <!-- Контент -->
         <div class="relative z-10">
-            <h1 class="title-text text-5xl md:text-6xl mb-6 animate-pulse">
+            <h1 class="title-text text-6xl md:text-7xl mb-7 animate-pulse">
                 Я люблю Мадину
             </h1>
             
@@ -251,7 +251,7 @@ body {
             
             // Анимация кнопки
             this.style.transform = 'scale(1.2)';
-            this.textContent = 'Ура! 🎉';
+            this.textContent = 'Мимими 🎉';
             
             // Отключить кнопку Нет
             noBtn.style.opacity = '0';
@@ -271,12 +271,12 @@ body {
             this.style.transform = `translateX(${100 + noClicks * 20}px) translateY(${randomY}px)`;
             
             // Меняем текст
-            const texts = ['Нет 💔', 'Точно нет?', 'Подумай ещё!', 'Пожалуйста!', 'Ну Мадина!'];
+            const texts = ['Нет 💔', 'Точно нет?', 'Подумай ещё!', 'Пожалуйста!', 'Мадин, не серьезно'];
             this.textContent = texts[Math.min(noClicks, texts.length - 1)];
             
             // Если слишком много кликов
             if (noClicks > 5) {
-                this.textContent = 'Уже поздно! 😅';
+                this.textContent = 'Я обиделся.';
                 this.style.opacity = '0.5';
             }
         });
