@@ -1,1301 +1,301 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Merge 100 - Эволюция</title>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;500;700&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Exo 2', sans-serif;
-    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-    min-height: 100vh;
-    overflow-x: hidden;
-    color: white;
-}
-
-.game-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.header {
-    text-align: center;
-    margin-bottom: 20px;
-    animation: fadeInDown 0.8s ease;
-}
-
-h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3.5em;
-    text-shadow: 0 0 30px rgba(100, 200, 255, 0.8);
-    margin-bottom: 10px;
-    background: linear-gradient(45deg, #00f5ff, #ff00ff, #ffff00, #00f5ff);
-    background-size: 400% 400%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradient 4s ease infinite;
-    letter-spacing: 3px;
-}
-
-.subtitle {
-    font-size: 1.2em;
-    opacity: 0.8;
-    color: #a0a0ff;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.stat-card {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(15px);
-    padding: 20px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    transition: left 0.5s;
-}
-
-.stat-card:hover::before {
-    left: 100%;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-}
-
-.stat-icon {
-    font-size: 2em;
-    margin-bottom: 5px;
-}
-
-.stat-label {
-    font-size: 0.85em;
-    opacity: 0.7;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 5px;
-}
-
-.stat-value {
-    font-size: 1.8em;
-    font-weight: bold;
-    font-family: 'Orbitron', sans-serif;
-}
-
-.coins { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
-.exp { color: #00f5ff; text-shadow: 0 0 20px rgba(0,245,255,0.5); }
-.level { color: #ff00ff; text-shadow: 0 0 20px rgba(255,0,255,0.5); }
-.prestige { color: #ff6b6b; text-shadow: 0 0 20px rgba(255,107,107,0.5); }
-
-.progress-container {
-    margin-top: 10px;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(0,0,0,0.3);
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #00f5ff, #ff00ff);
-    transition: width 0.5s ease;
-    box-shadow: 0 0 15px rgba(0,245,255,0.5);
-    position: relative;
-}
-
-.progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
-}
-
-.game-area {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 12px;
-    max-width: 900px;
-    margin: 0 auto 30px;
-    padding: 25px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 25px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.1);
-    position: relative;
-}
-
-.item {
-    aspect-ratio: 1;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    position: relative;
-    overflow: hidden;
-    font-weight: bold;
-    font-size: 1.1em;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.2);
-    border: 2px solid rgba(255,255,255,0.2);
-    user-select: none;
-}
-
-.item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
-    pointer-events: none;
-}
-
-.item::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 50%);
-    pointer-events: none;
-}
-
-.item:hover {
-    transform: scale(1.15) rotate(5deg);
-    z-index: 10;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-}
-
-.item.selected {
-    animation: pulse 0.6s infinite alternate;
-    border-color: #fff;
-    box-shadow: 0 0 40px rgba(255,255,255,0.8), inset 0 0 20px rgba(255,255,255,0.3);
-}
-
-.item.merging {
-    animation: mergePop 0.7s ease;
-}
-
-.item-locked {
-    opacity: 0.3;
-    cursor: not-allowed;
-    filter: grayscale(100%);
-}
-
-.item-level {
-    font-size: 1.3em;
-    z-index: 1;
-    font-family: 'Orbitron', sans-serif;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-}
-
-.item-icon {
-    font-size: 2.5em;
-    margin-bottom: 5px;
-    z-index: 1;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-
-.item-income {
-    font-size: 0.75em;
-    opacity: 0.9;
-    z-index: 1;
-    margin-top: 2px;
-}
-
-.controls {
-    text-align: center;
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    color: white;
-    padding: 15px 30px;
-    font-size: 1em;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-    font-family: 'Exo 2', sans-serif;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
-}
-
-.btn:hover::before {
-    left: 100%;
-}
-
-.btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
-}
-
-.btn:active {
-    transform: translateY(-1px);
-}
-
-.btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
-}
-
-.btn-warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
-}
-
-.btn-legendary {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    box-shadow: 0 6px 20px rgba(250, 112, 154, 0.4);
-    animation: glow 2s ease-in-out infinite alternate;
-}
-
-.shop {
-    background: rgba(255,255,255,0.03);
-    border-radius: 25px;
-    padding: 25px;
-    margin-top: 20px;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.shop h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    color: #ffd700;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.8em;
-    text-shadow: 0 0 20px rgba(255,215,0,0.5);
-}
-
-.shop-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.shop-item {
-    background: rgba(255,255,255,0.05);
-    padding: 20px;
-    border-radius: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
-
-.shop-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.05), transparent);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.shop-item:hover::before {
-    opacity: 1;
-}
-
-.shop-item:hover {
-    border-color: #00f5ff;
-    transform: translateY(-8px);
-    background: rgba(255,255,255,0.1);
-    box-shadow: 0 15px 40px rgba(0,245,255,0.2);
-}
-
-.shop-item.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.shop-item-icon {
-    font-size: 3em;
-    margin-bottom: 10px;
-}
-
-.shop-item-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 1.1em;
-}
-
-.shop-item-desc {
-    font-size: 0.85em;
-    opacity: 0.7;
-    margin-bottom: 10px;
-}
-
-.shop-item-cost {
-    color: #ffd700;
-    font-weight: bold;
-    font-size: 1.2em;
-    font-family: 'Orbitron', sans-serif;
-}
-
-.floating-text {
-    position: fixed;
-    pointer-events: none;
-    font-weight: bold;
-    font-size: 1.4em;
-    animation: floatUp 1.2s ease-out forwards;
-    z-index: 1000;
-    text-shadow: 0 0 20px rgba(0,0,0,0.8);
-    font-family: 'Orbitron', sans-serif;
-}
-
-.victory-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.95);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 2000;
-    animation: fadeIn 0.5s;
-}
-
-.victory-screen.active {
-    display: flex;
-}
-
-.victory-title {
-    font-size: 4em;
-    background: linear-gradient(45deg, #ffd700, #ff00ff, #00f5ff, #ffd700);
-    background-size: 400% 400%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradient 3s ease infinite;
-    margin-bottom: 20px;
-    text-align: center;
-    font-family: 'Orbitron', sans-serif;
-}
-
-.prestige-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.95);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 2000;
-    animation: fadeIn 0.5s;
-}
-
-.prestige-screen.active {
-    display: flex;
-}
-
-.achievement-popup {
-    position: fixed;
-    top: 20px;
-    right: -400px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    transition: right 0.5s ease;
-    z-index: 1500;
-    max-width: 350px;
-}
-
-.achievement-popup.show {
-    right: 20px;
-}
-
-.achievement-title {
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 5px;
-    color: #ffd700;
-}
-
-.particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 999;
-}
-
-.particle {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    animation: particleFloat 1.2s ease-out forwards;
-}
-
-.info-panel {
-    text-align: center;
-    margin-bottom: 20px;
-    padding: 20px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 20px;
-    font-size: 1em;
-    line-height: 1.6;
-    border: 1px solid rgba(255,255,255,0.1);
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.max-level {
-    animation: rainbow 3s linear infinite;
-}
-
-.combo-indicator {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 4em;
-    font-weight: bold;
-    font-family: 'Orbitron', sans-serif;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 999;
-    text-shadow: 0 0 40px rgba(255,215,0,0.8);
-}
-
-.combo-indicator.show {
-    animation: comboPop 1s ease-out forwards;
-}
-
-@keyframes pulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.08); }
-}
-
-@keyframes mergePop {
-    0% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.4); filter: brightness(1.8); }
-    100% { transform: scale(1); filter: brightness(1); }
-}
-
-@keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0) scale(1); }
-    50% { opacity: 1; transform: translateY(-50px) scale(1.2); }
-    100% { opacity: 0; transform: translateY(-120px) scale(1.5); }
-}
-
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes gradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
-@keyframes rainbow {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
-}
-
-@keyframes glow {
-    from { box-shadow: 0 6px 20px rgba(250, 112, 154, 0.4); }
-    to { box-shadow: 0 6px 30px rgba(250, 112, 154, 0.8), 0 0 40px rgba(254, 225, 64, 0.4); }
-}
-
-@keyframes comboPop {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
-    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
-}
-
-@media (max-width: 768px) {
-    h1 { font-size: 2em; }
-    .game-area { grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 15px; }
-    .item-icon { font-size: 1.8em; }
-    .shop-grid { grid-template-columns: 1fr; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для Мадины</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Pacifico&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            font-family: 'Caveat', cursive;
+        }
+
+        /* Фон с сердечками */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .heart-particle {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.6);
+            animation: floatUp 10s linear infinite;
+            bottom: -100px;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Контейнер валентинки */
+        .valentine-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3), 
+                        inset 0 0 0 2px rgba(255, 255, 255, 0.8);
+            border: 8px solid #fff;
+            position: relative;
+            z-index: 10;
+            transition: all 0.5s ease;
+        }
+
+        /* Декоративные уголки */
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #ff6b6b;
+            border-radius: 50%;
+        }
+        .corner-tl { top: -20px; left: -20px; }
+        .corner-tr { top: -20px; right: -20px; }
+        .corner-bl { bottom: -20px; left: -20px; }
+        .corner-br { bottom: -20px; right: -20px; }
+
+        .title-text {
+            font-family: 'Pacifico', cursive;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(255, 107, 107, 0.2);
+        }
+
+        .btn {
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        /* Салют */
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)); opacity: 0; }
+        }
+
+        .hidden-message {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+        }
+
+        .show-message {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
 </head>
-<body>
-    <div class="game-container">
-        <div class="header">
-            <h1>🔥 MERGE 100 🔥</h1>
-            <p class="subtitle">Создайте легендарный артефакт 100 уровня!</p>
-        </div>
+<body class="h-screen flex items-center justify-center">
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">💰</div>
-                <div class="stat-label">Монеты</div>
-                <div class="stat-value coins" id="coins">50</div>
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="coin-progress" style="width: 0%"></div>
-                    </div>
-                </div>
+    <!-- Фон с сердечками -->
+    <div class="hearts-bg" id="heartsContainer"></div>
+
+    <!-- Валентинка -->
+    <div class="valentine-card p-12 max-w-lg w-full mx-4 text-center relative">
+        <!-- Декоративные уголки -->
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+
+        <!-- Контент -->
+        <div class="relative z-10">
+            <h1 class="title-text text-5xl md:text-6xl mb-6 animate-pulse">
+                Я люблю Мадину
+            </h1>
+            
+            <div class="mb-10">
+                <p class="text-3xl text-gray-700 font-bold mb-2">А ты меня любишь?</p>
+                <div class="text-4xl animate-bounce">💕</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">⭐</div>
-                <div class="stat-label">Опыт</div>
-                <div class="stat-value exp" id="exp">0</div>
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="exp-progress" style="width: 0%"></div>
-                    </div>
-                </div>
+
+            <div class="flex justify-center gap-6 items-center flex-wrap" id="buttonContainer">
+                <button id="yesBtn" class="btn btn-yes text-white px-8 py-4 rounded-full text-2xl font-bold transform hover:scale-110 active:scale-95">
+                    Да ❤️
+                </button>
+                
+                <button id="noBtn" class="btn btn-no text-white px-8 py-4 rounded-full text-2xl font-bold transform hover:scale-110 active:scale-95 relative">
+                    Нет 💔
+                </button>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">🏆</div>
-                <div class="stat-label">Макс. Уровень</div>
-                <div class="stat-value level" id="max-level">1</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">💎</div>
-                <div class="stat-label">Очки Престижа</div>
-                <div class="stat-value prestige" id="prestige-points">0</div>
-            </div>
-        </div>
 
-        <div class="info-panel">
-            💡 <strong>Как играть:</strong> Выбирайте два одинаковых предмета для слияния. 
-            Чем выше уровень, тем больше доход! Текущий доход: <span id="income-display" style="color: #ffd700; font-weight: bold;">1</span> монет/сек
-            <br><span id="combo-text" style="color: #ff00ff; font-weight: bold;"></span>
-        </div>
-
-        <div class="controls">
-            <button class="btn" onclick="game.spawnItem()" id="spawn-btn">
-                🎲 Создать предмет (10💰)
-            </button>
-            <button class="btn btn-success" onclick="game.mergeAll()" id="merge-all-btn">
-                ⚡ Слить всё возможное
-            </button>
-            <button class="btn btn-warning" onclick="game.buyAutoMerge()" id="auto-merge-btn">
-                🤖 Авто-слияние (1000💰)
-            </button>
-            <button class="btn btn-legendary" onclick="game.prestige()" id="prestige-btn" style="display: none;">
-                💎 ПРЕСТИЖ (Сброс с бонусом)
-            </button>
-        </div>
-
-        <div class="game-area" id="game-area"></div>
-
-        <div class="shop">
-            <h2>🛒 Магазин Улучшений</h2>
-            <div class="shop-grid">
-                <div class="shop-item" onclick="game.buySlot()" id="shop-slot">
-                    <div class="shop-item-icon">📦</div>
-                    <div class="shop-item-name">Новый Слот</div>
-                    <div class="shop-item-desc">+1 место для предметов</div>
-                    <div class="shop-item-cost">💰 <span id="slot-cost">100</span></div>
-                </div>
-                <div class="shop-item" onclick="game.boostIncome()" id="shop-boost">
-                    <div class="shop-item-icon">⚡</div>
-                    <div class="shop-item-name">Усилитель Дохода</div>
-                    <div class="shop-item-desc">Увеличивает доход в 2 раза</div>
-                    <div class="shop-item-cost">💰 <span id="boost-cost">500</span></div>
-                </div>
-                <div class="shop-item" onclick="game.buyCriticalChance()" id="shop-crit">
-                    <div class="shop-item-icon">🎯</div>
-                    <div class="shop-item-name">Критический Шанс</div>
-                    <div class="shop-item-desc">Шанс получить +1 уровень при создании</div>
-                    <div class="shop-item-cost">💰 <span id="crit-cost">2000</span></div>
-                </div>
-                <div class="shop-item" onclick="game.buyTimeWarp()" id="shop-warp">
-                    <div class="shop-item-icon">⏰</div>
-                    <div class="shop-item-name">Временной Скачок</div>
-                    <div class="shop-item-desc">Получить 5 минут дохода мгновенно</div>
-                    <div class="shop-item-cost">💰 <span id="warp-cost">5000</span></div>
-                </div>
+            <!-- Скрытое сообщение после нажатия Да -->
+            <div id="loveMessage" class="hidden-message mt-8">
+                <p class="text-4xl text-pink-600 font-bold">Я знал! 💖</p>
+                <p class="text-2xl text-gray-600 mt-2">Ты моя валентинка!</p>
             </div>
         </div>
     </div>
-
-    <div class="victory-screen" id="victory">
-        <div class="victory-title">🎉 ПОБЕДА! 🎉</div>
-        <p style="font-size: 1.5em; margin-bottom: 20px;">Вы создали артефакт 100 уровня!</p>
-        <p style="font-size: 1.2em; margin-bottom: 10px;">Финальный счёт: <span id="final-score" style="color: #ffd700;"></span></p>
-        <p style="font-size: 1.1em; margin-bottom: 30px; opacity: 0.8;">Очки престижа: +<span id="victory-prestige" style="color: #ff6b6b;"></span></p>
-        <button class="btn btn-legendary" onclick="game.continueAfterVictory()">🚀 Продолжить игру</button>
-        <button class="btn" onclick="location.reload()" style="margin-top: 15px;">🔄 Начать заново</button>
-    </div>
-
-    <div class="prestige-screen" id="prestige-screen">
-        <div class="victory-title">💎 ПРЕСТИЖ 💎</div>
-        <p style="font-size: 1.3em; margin-bottom: 20px; max-width: 600px; text-align: center;">
-            Сбросьте прогресс чтобы получить <span style="color: #ff6b6b; font-weight: bold;">Очки Престижа</span>!<br>
-            Каждое очко даёт <span style="color: #ffd700;">+10%</span> к доходу навсегда.
-        </p>
-        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 30px;">
-            <p>Текущий множитель: <span id="current-multiplier" style="color: #00f5ff; font-size: 1.3em;">1.0x</span></p>
-            <p>После престижа: <span id="new-multiplier" style="color: #ffd700; font-size: 1.3em;">1.0x</span></p>
-            <p>Очки престижа: +<span id="prestige-gain" style="color: #ff6b6b; font-size: 1.3em;">0</span></p>
-        </div>
-        <button class="btn btn-legendary" onclick="game.confirmPrestige()">💎 Подтвердить Престиж</button>
-        <button class="btn" onclick="game.closePrestige()" style="margin-top: 15px;">❌ Отмена</button>
-    </div>
-
-    <div class="achievement-popup" id="achievement">
-        <div class="achievement-title">🏆 Достижение разблокировано!</div>
-        <div id="achievement-text">Текст достижения</div>
-    </div>
-
-    <div class="combo-indicator" id="combo">COMBO x2!</div>
-
-    <canvas class="particles" id="particles"></canvas>
 
     <script>
-        class Game {
-            constructor() {
-                this.coins = 50;
-                this.exp = 0;
-                this.maxLevel = 1;
-                this.items = [];
-                this.selectedIndex = null;
-                this.slots = 10;
-                this.incomeMultiplier = 1;
-                this.prestigeMultiplier = 1;
-                this.prestigePoints = 0;
-                this.baseIncome = 1;
-                this.lastIncome = 0;
-                this.autoMergeUnlocked = false;
-                this.autoMergeInterval = null;
-                this.criticalChance = 0;
-                this.comboCount = 0;
-                this.lastMergeTime = 0;
-                this.achievements = new Set();
-                this.victoryAchieved = false;
+        // Создание фона с сердечками
+        function createHearts() {
+            const container = document.getElementById('heartsContainer');
+            const heartSymbols = ['💕', '💖', '💗', '💓', '💝', '❤️', '💘'];
+            
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                heart.style.opacity = Math.random() * 0.5 + 0.3;
                 
-                this.costs = {
-                    slot: 100,
-                    boost: 500,
-                    autoMerge: 1000,
-                    crit: 2000,
-                    warp: 5000
-                };
+                container.appendChild(heart);
                 
-                this.levelEmojis = {
-                    1: '🌱', 2: '🌿', 3: '🍀', 4: '🌲', 5: '🌳',
-                    6: '🌴', 7: '🎋', 8: '🎄', 9: '🌵', 10: '⚡',
-                    11: '🔥', 12: '💧', 13: '❄️', 14: '🌪️', 15: '🌈',
-                    16: '☀️', 17: '🌙', 18: '⭐', 19: '🌟', 20: '💫',
-                    21: '🪐', 22: '🌍', 23: '🌠', 24: '🎯', 25: '🎪',
-                    26: '🎨', 27: '🎭', 28: '🎰', 29: '🎲', 30: '🔮',
-                    31: '💎', 32: '💍', 33: '👑', 34: '🏆', 35: '🎖️',
-                    36: '🏅', 37: '🥇', 38: '🥈', 39: '🥉', 40: '⚜️',
-                    41: '🔱', 42: '⚖️', 43: '🗝️', 44: '🛡️', 45: '⚔️',
-                    46: '🏹', 47: '🔫', 48: '💣', 49: '🧪', 50: '⚗️',
-                    51: '🔭', 52: '🔬', 53: '📡', 54: '🚀', 55: '🛸',
-                    56: '🌌', 57: '👽', 58: '🤖', 59: '👾', 60: '🎮',
-                    61: '🕹️', 62: '💻', 63: '📱', 64: '💾', 65: '💿',
-                    66: '📀', 67: '🎵', 68: '🎶', 69: '🎼', 70: '🎹',
-                    71: '🎸', 72: '🎺', 73: '🎻', 74: '📯', 75: '🔔',
-                    76: '🕯️', 77: '💡', 78: '🔦', 79: '🏮', 80: '🎆',
-                    81: '🎇', 82: '✨', 83: '🎈', 84: '🎉', 85: '🎊',
-                    86: '🎋', 87: '🎍', 88: '🎎', 89: '🎏', 90: '🎐',
-                    91: '🎑', 92: '🧧', 93: '🎀', 94: '🎁', 95: '🎗️',
-                    96: '🏷️', 97: '📛', 98: '🔖', 99: '📌', 100: '👑'
-                };
+                setTimeout(() => heart.remove(), 10000);
+            }, 300);
+        }
+
+        createHearts();
+
+        // Логика кнопок
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const loveMessage = document.getElementById('loveMessage');
+        let yesScale = 1;
+        let noClicks = 0;
+
+        // Функция салюта
+        function createFireworks(x, y) {
+            const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
+            
+            for (let i = 0; i < 30; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.left = x + 'px';
+                firework.style.top = y + 'px';
+                firework.style.background = colors[Math.floor(Math.random() * colors.length)];
                 
-                this.init();
-            }
-
-            init() {
-                this.render();
-                this.startIncome();
-                this.spawnInitialItems();
-                this.checkPrestigeAvailability();
-            }
-
-            spawnInitialItems() {
-                for (let i = 0; i < 4; i++) {
-                    this.items.push({ level: 1, id: Date.now() + i });
-                }
-                this.render();
-            }
-
-            getItemColor(level) {
-                if (level >= 100) return `linear-gradient(45deg, #ffd700, #ff00ff, #00f5ff, #ffd700)`;
-                if (level >= 90) return `linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #ff006e)`;
-                if (level >= 80) return `linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #f72585)`;
-                if (level >= 70) return `linear-gradient(45deg, #ff006e, #ffbe0b, #fb5607, #ff006e)`;
-                if (level >= 60) return `linear-gradient(45deg, #00f5ff, #00bbf9, #00f5d4, #00f5ff)`;
-                if (level >= 50) return `linear-gradient(45deg, #9b5de5, #f15bb5, #00bbf9, #9b5de5)`;
-                if (level >= 40) return `linear-gradient(45deg, #00bbf9, #00f5d4, #fee440, #00bbf9)`;
-                if (level >= 30) return `linear-gradient(45deg, #f15bb5, #fee440, #00f5d4, #f15bb5)`;
-                if (level >= 20) return `linear-gradient(45deg, #9b5de5, #00bbf9, #00f5d4, #9b5de5)`;
-                if (level >= 10) return `linear-gradient(45deg, #2ecc71, #3498db, #9b59b6, #2ecc71)`;
+                const angle = (Math.PI * 2 * i) / 30;
+                const velocity = Math.random() * 100 + 50;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
                 
-                const colors = [
-                    '#2ecc71', '#27ae60', '#229954', '#1e8449', '#1abc9c',
-                    '#16a085', '#3498db', '#2980b9', '#9b59b6', '#8e44ad'
-                ];
-                return colors[(level - 1) % colors.length];
-            }
-
-            getItemEmoji(level) {
-                return this.levelEmojis[level] || '✨';
-            }
-
-            formatNumber(num) {
-                if (num >= 1e100) return num.toExponential(2);
-                if (num >= 1e18) return (num / 1e18).toFixed(1) + 'Qi';
-                if (num >= 1e15) return (num / 1e15).toFixed(1) + 'Qa';
-                if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T';
-                if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
-                if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
-                if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
-                return Math.floor(num).toString();
-            }
-
-            getIncome() {
-                let income = 0;
-                this.items.forEach(item => {
-                    income += Math.pow(1.8, item.level - 1) * (1 + item.level * 0.1);
-                });
-                return income * this.incomeMultiplier * this.prestigeMultiplier;
-            }
-
-            startIncome() {
-                setInterval(() => {
-                    const income = this.getIncome();
-                    this.coins += income;
-                    this.lastIncome = income;
-                    this.updateUI();
-                }, 1000);
-            }
-
-            spawnItem() {
-                if (this.items.length >= this.slots) {
-                    this.showFloatingText('Нет места!', window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
-                    return;
-                }
-                if (this.coins < 10) {
-                    this.showFloatingText('Недостаточно монет!', window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
-                    return;
-                }
+                firework.style.setProperty('--x', tx + 'px');
+                firework.style.setProperty('--y', ty + 'px');
                 
-                this.coins -= 10;
-                
-                let level = 1;
-                const rand = Math.random();
-                
-                if (rand < this.criticalChance) {
-                    level = Math.min(5, Math.floor(this.maxLevel / 3) + 1);
-                    this.showFloatingText('КРИТ! +' + level + ' уровень!', window.innerWidth/2, window.innerHeight/2 - 50, '#ff00ff');
-                } else if (rand > 0.95 && this.maxLevel >= 10) {
-                    level = Math.min(5, Math.floor(this.maxLevel / 4));
-                } else if (rand > 0.85 && this.maxLevel >= 5) {
-                    level = Math.min(3, Math.floor(this.maxLevel / 5));
-                } else if (rand > 0.7 && this.maxLevel >= 3) {
-                    level = 2;
-                }
-                
-                this.items.push({ level, id: Date.now() });
-                this.render();
-                this.createParticles(window.innerWidth/2, window.innerHeight/2);
-            }
-
-            selectItem(index) {
-                if (this.selectedIndex === null) {
-                    this.selectedIndex = index;
-                    this.render();
-                } else if (this.selectedIndex === index) {
-                    this.selectedIndex = null;
-                    this.render();
-                } else {
-                    this.tryMerge(this.selectedIndex, index);
-                    this.selectedIndex = null;
-                }
-            }
-
-            tryMerge(idx1, idx2) {
-                const item1 = this.items[idx1];
-                const item2 = this.items[idx2];
-
-                if (item1.level === item2.level) {
-                    const newLevel = item1.level + 1;
-                    const rect = document.querySelector(`[data-index="${idx2}"]`)?.getBoundingClientRect();
-                    const x = rect ? rect.left + 50 : window.innerWidth/2;
-                    const y = rect ? rect.top : window.innerHeight/2;
-                    
-                    const now = Date.now();
-                    if (now - this.lastMergeTime < 2000) {
-                        this.comboCount++;
-                    } else {
-                        this.comboCount = 1;
-                    }
-                    this.lastMergeTime = now;
-                    
-                    const comboBonus = Math.min(this.comboCount, 5);
-                    if (comboBonus > 1) {
-                        this.showCombo(comboBonus);
-                    }
-                    
-                    const expGain = newLevel * 10 * comboBonus;
-                    const coinBonus = Math.pow(2, newLevel) * comboBonus;
-                    
-                    this.exp += expGain;
-                    this.coins += coinBonus;
-                    
-                    if (newLevel > this.maxLevel) {
-                        this.maxLevel = newLevel;
-                        this.checkAchievements('level', newLevel);
-                        this.showFloatingText(`Новый рекорд: ${newLevel}!`, x, y - 20, '#ffd700');
-                    }
-                    
-                    this.showFloatingText(`+${this.formatNumber(coinBonus)}💰`, x, y + 10, '#ffd700');
-                    this.showFloatingText(`+${expGain}⭐`, x, y + 40, '#00f5ff');
-                    
-                    if (comboBonus > 1) {
-                        this.showFloatingText(`COMBO x${comboBonus}!`, x, y + 70, '#ff00ff');
-                    }
-                    
-                    const newItems = this.items.filter((_, i) => i !== idx1 && i !== idx2);
-                    newItems.push({ level: newLevel, id: Date.now() });
-                    this.items = newItems;
-                    
-                    this.createParticles(x, y + 50);
-                    
-                    if (newLevel >= 100 && !this.victoryAchieved) {
-                        this.victory();
-                    }
-                    
-                    this.checkPrestigeAvailability();
-                    this.render();
-                } else {
-                    this.showFloatingText('Разные уровни!', window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
-                    this.comboCount = 0;
-                    this.selectedIndex = null;
-                    this.render();
-                }
-            }
-
-            mergeAll() {
-                let merged = false;
-                let iterations = 0;
-                const maxIterations = 50;
-                
-                do {
-                    merged = false;
-                    const levels = {};
-                    
-                    this.items.forEach((item, idx) => {
-                        if (!levels[item.level]) levels[item.level] = [];
-                        levels[item.level].push(idx);
-                    });
-                    
-                    for (let level in levels) {
-                        while (levels[level].length >= 2) {
-                            const idx1 = levels[level].shift();
-                            const idx2 = levels[level].shift();
-                            this.tryMerge(idx1, idx2);
-                            merged = true;
-                            
-                            Object.keys(levels).forEach(l => {
-                                levels[l] = levels[l].map(i => {
-                                    if (i > idx1 && i > idx2) return i - 2;
-                                    if (i > idx1 || i > idx2) return i - 1;
-                                    return i;
-                                });
-                            });
-                            break;
-                        }
-                        if (merged) break;
-                    }
-                    iterations++;
-                } while (merged && iterations < maxIterations);
-                
-                if (iterations === 1 && !merged) {
-                    this.showFloatingText('Нет пар для слияния!', window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
-                }
-            }
-
-            buySlot() {
-                if (this.coins >= this.costs.slot) {
-                    this.coins -= this.costs.slot;
-                    this.slots++;
-                    this.costs.slot = Math.floor(this.costs.slot * 1.6);
-                    this.render();
-                    this.showFloatingText('+1 слот!', window.innerWidth/2, window.innerHeight/2, '#00f5ff');
-                }
-            }
-
-            boostIncome() {
-                if (this.coins >= this.costs.boost) {
-                    this.coins -= this.costs.boost;
-                    this.incomeMultiplier *= 2;
-                    this.costs.boost = Math.floor(this.costs.boost * 2.5);
-                    this.render();
-                    this.showFloatingText('Доход x2!', window.innerWidth/2, window.innerHeight/2, '#ffd700');
-                }
-            }
-
-            buyAutoMerge() {
-                if (this.autoMergeUnlocked) return;
-                if (this.coins >= this.costs.autoMerge) {
-                    this.coins -= this.costs.autoMerge;
-                    this.autoMergeUnlocked = true;
-                    this.startAutoMerge();
-                    this.render();
-                    this.showFloatingText('Авто-слияние активировано!', window.innerWidth/2, window.innerHeight/2, '#ff00ff');
-                }
-            }
-
-            buyCriticalChance() {
-                if (this.coins >= this.costs.crit && this.criticalChance < 0.5) {
-                    this.coins -= this.costs.crit;
-                    this.criticalChance = Math.min(0.5, this.criticalChance + 0.05);
-                    this.costs.crit = Math.floor(this.costs.crit * 1.8);
-                    this.render();
-                    this.showFloatingText(`Шанс крита: ${(this.criticalChance * 100).toFixed(0)}%`, window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
-                }
-            }
-
-            buyTimeWarp() {
-                if (this.coins >= this.costs.warp) {
-                    this.coins -= this.costs.warp;
-                    const warpIncome = this.getIncome() * 300;
-                    this.coins += warpIncome;
-                    this.costs.warp = Math.floor(this.costs.warp * 1.5);
-                    this.render();
-                    this.showFloatingText(`+${this.formatNumber(warpIncome)}💰`, window.innerWidth/2, window.innerHeight/2, '#ffd700');
-                    this.createParticles(window.innerWidth/2, window.innerHeight/2);
-                }
-            }
-
-            startAutoMerge() {
-                this.autoMergeInterval = setInterval(() => {
-                    const levels = {};
-                    this.items.forEach((item, idx) => {
-                        if (!levels[item.level]) levels[item.level] = [];
-                        levels[item.level].push(idx);
-                    });
-                    
-                    for (let level in levels) {
-                        if (levels[level].length >= 2) {
-                            this.tryMerge(levels[level][0], levels[level][1]);
-                            break;
-                        }
-                    }
-                }, 3000);
-            }
-
-            checkPrestigeAvailability() {
-                const btn = document.getElementById('prestige-btn');
-                if (this.maxLevel >= 25) {
-                    btn.style.display = 'inline-block';
-                }
-            }
-
-            prestige() {
-                const gain = Math.floor(Math.pow(this.maxLevel, 1.5) / 10);
-                document.getElementById('current-multiplier').textContent = this.prestigeMultiplier.toFixed(1) + 'x';
-                document.getElementById('new-multiplier').textContent = (this.prestigeMultiplier + gain * 0.1).toFixed(1) + 'x';
-                document.getElementById('prestige-gain').textContent = gain;
-                document.getElementById('prestige-screen').classList.add('active');
-            }
-
-            confirmPrestige() {
-                const gain = Math.floor(Math.pow(this.maxLevel, 1.5) / 10);
-                this.prestigePoints += gain;
-                this.prestigeMultiplier += gain * 0.1;
-                
-                this.coins = 50;
-                this.exp = 0;
-                this.maxLevel = 1;
-                this.items = [];
-                this.selectedIndex = null;
-                this.slots = 10;
-                this.incomeMultiplier = 1;
-                this.criticalChance = 0;
-                this.comboCount = 0;
-                
-                this.costs = {
-                    slot: 100,
-                    boost: 500,
-                    autoMerge: 1000,
-                    crit: 2000,
-                    warp: 5000
-                };
-                
-                if (this.autoMergeInterval) {
-                    clearInterval(this.autoMergeInterval);
-                    this.autoMergeInterval = null;
-                }
-                this.autoMergeUnlocked = false;
-                
-                this.closePrestige();
-                this.spawnInitialItems();
-                this.render();
-                this.showFloatingText(`Престиж выполнен! +${gain} очков`, window.innerWidth/2, window.innerHeight/2, '#ff6b6b');
-            }
-
-            closePrestige() {
-                document.getElementById('prestige-screen').classList.remove('active');
-            }
-
-            checkAchievements(type, value) {
-                const achievements = [
-                    { id: 'level10', check: () => this.maxLevel >= 10, text: 'Достигнут 10 уровень!' },
-                    { id: 'level25', check: () => this.maxLevel >= 25, text: 'Достигнут 25 уровень!' },
-                    { id: 'level50', check: () => this.maxLevel >= 50, text: 'Достигнут 50 уровень!' },
-                    { id: 'level75', check: () => this.maxLevel >= 75, text: 'Достигнут 75 уровень!' },
-                    { id: 'rich', check: () => this.coins >= 1000000, text: 'Миллионер!' },
-                    { id: 'slots', check: () => this.slots >= 20, text: 'Коллекционер!' }
-                ];
-                
-                achievements.forEach(ach => {
-                    if (!this.achievements.has(ach.id) && ach.check()) {
-                        this.achievements.add(ach.id);
-                        this.showAchievement(ach.text);
-                    }
-                });
-            }
-
-            showAchievement(text) {
-                const popup = document.getElementById('achievement');
-                document.getElementById('achievement-text').textContent = text;
-                popup.classList.add('show');
-                setTimeout(() => popup.classList.remove('show'), 3000);
-            }
-
-            showCombo(multiplier) {
-                const combo = document.getElementById('combo');
-                combo.textContent = `COMBO x${multiplier}!`;
-                combo.classList.add('show');
-                setTimeout(() => combo.classList.remove('show'), 1000);
-            }
-
-            victory() {
-                this.victoryAchieved = true;
-                const prestigeGain = Math.floor(Math.pow(100, 1.5) / 5);
-                document.getElementById('final-score').textContent = this.formatNumber(this.coins);
-                document.getElementById('victory-prestige').textContent = prestigeGain;
-                document.getElementById('victory').classList.add('active');
-                this.createFireworks();
-            }
-
-            continueAfterVictory() {
-                document.getElementById('victory').classList.remove('active');
-                this.prestigePoints += Math.floor(Math.pow(100, 1.5) / 5);
-                this.prestigeMultiplier += Math.floor(Math.pow(100, 1.5) / 5) * 0.1;
-            }
-
-            showFloatingText(text, x, y, color) {
-                const el = document.createElement('div');
-                el.className = 'floating-text';
-                el.textContent = text;
-                el.style.left = x + 'px';
-                el.style.top = y + 'px';
-                el.style.color = color;
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 1200);
-            }
-
-            createParticles(x, y) {
-                for (let i = 0; i < 25; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    particle.style.left = x + 'px';
-                    particle.style.top = y + 'px';
-                    const angle = (Math.PI * 2 * i) / 25;
-                    const velocity = 50 + Math.random() * 100;
-                    particle.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
-                    particle.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
-                    particle.style.background = `hsl(${Math.random() * 360}, 100%, 60%)`;
-                    particle.style.boxShadow = `0 0 10px ${particle.style.background}`;
-                    document.body.appendChild(particle);
-                    setTimeout(() => particle.remove(), 1200);
-                }
-            }
-
-            createFireworks() {
-                const interval = setInterval(() => {
-                    if (!document.getElementById('victory').classList.contains('active')) {
-                        clearInterval(interval);
-                        return;
-                    }
-                    const x = Math.random() * window.innerWidth;
-                    const y = Math.random() * window.innerHeight;
-                    this.createParticles(x, y);
-                }, 300);
-            }
-
-            updateUI() {
-                document.getElementById('coins').textContent = this.formatNumber(this.coins);
-                document.getElementById('exp').textContent = this.formatNumber(this.exp);
-                document.getElementById('max-level').textContent = this.maxLevel;
-                document.getElementById('prestige-points').textContent = this.prestigePoints;
-                document.getElementById('income-display').textContent = this.formatNumber(this.getIncome());
-                
-                const coinProgress = Math.min(100, (this.coins / (this.coins + 10000)) * 100);
-                document.getElementById('coin-progress').style.width = coinProgress + '%';
-                
-                const expProgress = Math.min(100, (this.exp / (this.exp + 1000)) * 100);
-                document.getElementById('exp-progress').style.width = expProgress + '%';
-                
-                document.getElementById('slot-cost').textContent = this.formatNumber(this.costs.slot);
-                document.getElementById('boost-cost').textContent = this.formatNumber(this.costs.boost);
-                document.getElementById('auto-merge-btn').innerHTML = 
-                    this.autoMergeUnlocked ? '✅ Авто-слияние активно' : `🤖 Авто-слияние (${this.formatNumber(this.costs.autoMerge)}💰)`;
-                document.getElementById('crit-cost').textContent = this.formatNumber(this.costs.crit);
-                document.getElementById('warp-cost').textContent = this.formatNumber(this.costs.warp);
-                
-                const spawnBtn = document.getElementById('spawn-btn');
-                spawnBtn.disabled = this.items.length >= this.slots || this.coins < 10;
-                
-                const autoMergeBtn = document.getElementById('auto-merge-btn');
-                autoMergeBtn.disabled = this.autoMergeUnlocked || this.coins < this.costs.autoMerge;
-                
-                document.getElementById('shop-slot').className = 
-                    'shop-item' + (this.coins < this.costs.slot ? ' disabled' : '');
-                document.getElementById('shop-boost').className = 
-                    'shop-item' + (this.coins < this.costs.boost ? ' disabled' : '');
-                document.getElementById('shop-crit').className = 
-                    'shop-item' + (this.coins < this.costs.crit || this.criticalChance >= 0.5 ? ' disabled' : '');
-                document.getElementById('shop-warp').className = 
-                    'shop-item' + (this.coins < this.costs.warp ? ' disabled' : '');
-            }
-
-            render() {
-                this.updateUI();
-                
-                const container = document.getElementById('game-area');
-                container.innerHTML = '';
-                
-                this.items.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    if (index === this.selectedIndex) div.classList.add('selected');
-                    if (item.level >= 100) div.classList.add('max-level');
-                    
-                    div.style.background = this.getItemColor(item.level);
-                    div.dataset.index = index;
-                    
-                    const income = Math.pow(1.8, item.level - 1) * (1 + item.level * 0.1) * this.incomeMultiplier * this.prestigeMultiplier;
-                    
-                    div.innerHTML = `
-                        <div class="item-icon">${this.getItemEmoji(item.level)}</div>
-                        <div class="item-level">${item.level}</div>
-                        <div class="item-income">${this.formatNumber(income)}/с</div>
-                    `;
-                    
-                    div.onclick = () => this.selectItem(index);
-                    container.appendChild(div);
-                });
-                
-                for (let i = this.items.length; i < this.slots; i++) {
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    div.style.background = 'rgba(255,255,255,0.03)';
-                    div.style.border = '2px dashed rgba(255,255,255,0.15)';
-                    div.style.cursor = 'default';
-                    div.innerHTML = '<div style="opacity: 0.2; font-size: 2em;">+</div>';
-                    container.appendChild(div);
-                }
+                document.body.appendChild(firework);
+                setTimeout(() => firework.remove(), 1000);
             }
         }
 
-        const game = new Game();
+        // Кнопка Да
+        yesBtn.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            // Множественные салюты
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFireworks(
+                        x + (Math.random() - 0.5) * 200,
+                        y + (Math.random() - 0.5) * 200
+                    );
+                }, i * 200);
+            }
 
-        window.addEventListener('resize', () => {
-            const canvas = document.getElementById('particles');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            // Показать сообщение
+            loveMessage.classList.add('show-message');
+            
+            // Анимация кнопки
+            this.style.transform = 'scale(1.2)';
+            this.textContent = 'Ура! 🎉';
+            
+            // Отключить кнопку Нет
+            noBtn.style.opacity = '0';
+            noBtn.style.pointerEvents = 'none';
+        });
+
+        // Кнопка Нет
+        noBtn.addEventListener('click', function(e) {
+            noClicks++;
+            yesScale += 0.3;
+            
+            // Увеличиваем кнопку Да
+            yesBtn.style.transform = `scale(${yesScale})`;
+            
+            // Перемещаем кнопку Нет вправо с случайным смещением
+            const randomY = (Math.random() - 0.5) * 50;
+            this.style.transform = `translateX(${100 + noClicks * 20}px) translateY(${randomY}px)`;
+            
+            // Меняем текст
+            const texts = ['Нет 💔', 'Точно нет?', 'Подумай ещё!', 'Пожалуйста!', 'Ну Мадина!'];
+            this.textContent = texts[Math.min(noClicks, texts.length - 1)];
+            
+            // Если слишком много кликов
+            if (noClicks > 5) {
+                this.textContent = 'Уже поздно! 😅';
+                this.style.opacity = '0.5';
+            }
+        });
+
+        // Добавляем плавающие сердечки при движении мыши
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() > 0.95) {
+                const heart = document.createElement('div');
+                heart.textContent = '💕';
+                heart.style.position = 'fixed';
+                heart.style.left = e.pageX + 'px';
+                heart.style.top = e.pageY + 'px';
+                heart.style.pointerEvents = 'none';
+                heart.style.fontSize = '20px';
+                heart.style.animation = 'floatUp 2s ease-out forwards';
+                heart.style.zIndex = '1000';
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 2000);
+            }
         });
     </script>
 </body>
